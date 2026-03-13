@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:fashion_app/providers/address_provider.dart';
+import 'package:fashion_app/models/address_model.dart' as addr;
 
 class CheckoutScreen extends ConsumerStatefulWidget {
   const CheckoutScreen({super.key});
@@ -34,9 +36,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     _prefillAddress();
   }
 
-  
-  /// Autofill add from gps
- 
   Future<void> _prefillAddress() async {
 
     final locationAsync = ref.read(locationProvider);
@@ -45,17 +44,14 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
       final parts = addressString.split(',').map((e) => e.trim()).toList();
 
-      /// street
       if (parts.isNotEmpty) {
         _streetCtrl.text = parts[0];
       }
 
-      /// city
       if (parts.length > 1) {
         _cityCtrl.text = parts[1];
       }
 
-      /// state and pincode 
       if (parts.length > 2) {
 
         final statePin = parts[2];
@@ -77,7 +73,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         }
       }
 
-      /// PINCODE in different part 
       if (parts.length > 3 && _pincodeCtrl.text.isEmpty) {
 
         final pinRegex = RegExp(r'\d{5,6}');
@@ -88,8 +83,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         }
       }
     });
-
-    /// USER PROFILE FALLBACK
 
     final user = ref.read(currentUserProfileProvider).value;
 
@@ -125,14 +118,14 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     super.dispose();
   }
 
-  
-  
-  void _proceed() {           /// PROCEED TO PAYMENT
+  void _proceed() {
 
     if (!_formKey.currentState!.validate()) return;
 
-    final address = AddressModel(
-      street: _streetCtrl.text.trim(),
+    final address = addr.AddressModel(
+      name: _nameCtrl.text.trim(),
+      phone: "",
+      addressLine: _streetCtrl.text.trim(),
       city: _cityCtrl.text.trim(),
       state: _stateCtrl.text.trim(),
       pincode: _pincodeCtrl.text.trim(),
@@ -154,6 +147,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     final total = ref.watch(cartTotalProvider);
     final subtotal = ref.watch(cartSubtotalProvider);
     final shipping = ref.watch(cartShippingFeeProvider);
+    final savedAddresses = ref.watch(addressProvider);
 
     return Scaffold(
 
@@ -171,7 +165,39 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             children: [
 
               const Text(
-                'Delivery Address',
+                'Saved Addresses',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              if (savedAddresses.isNotEmpty)
+                ...savedAddresses.map((addrItem) => Card(
+                      child: ListTile(
+                        leading: const Icon(Icons.location_on),
+                        title: Text(addrItem.name),
+                        subtitle: Text(
+                          "${addrItem.addressLine}, ${addrItem.city}, ${addrItem.state} - ${addrItem.pincode}",
+                        ),
+                        onTap: () {
+                          setState(() {
+                            _nameCtrl.text = addrItem.name;
+                            _streetCtrl.text = addrItem.addressLine;
+                            _cityCtrl.text = addrItem.city;
+                            _stateCtrl.text = addrItem.state;
+                            _pincodeCtrl.text = addrItem.pincode;
+                          });
+                        },
+                      ),
+                    )),
+
+              const SizedBox(height: 20),
+
+              const Text(
+                'Or Enter New Address',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -180,7 +206,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
               const SizedBox(height: 16),
 
-              /// NAME
               TextFormField(
                 controller: _nameCtrl,
                 validator: Validators.required,
@@ -189,7 +214,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
               const SizedBox(height: 12),
 
-              /// STREET
               TextFormField(
                 controller: _streetCtrl,
                 validator: Validators.required,
@@ -202,7 +226,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               Row(
                 children: [
 
-                  /// CITY
                   Expanded(
                     child: TextFormField(
                       controller: _cityCtrl,
@@ -213,7 +236,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
                   const SizedBox(width: 12),
 
-                  /// STATE
                   Expanded(
                     child: TextFormField(
                       controller: _stateCtrl,
@@ -226,25 +248,23 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
               const SizedBox(height: 12),
 
-              /// PINCODE
               TextFormField(
-  controller: _pincodeCtrl,
-  validator: Validators.pincode,
-  keyboardType: TextInputType.number,
-  maxLength: 6,
-  autovalidateMode: AutovalidateMode.onUserInteraction,
-  inputFormatters: [
-    FilteringTextInputFormatter.digitsOnly,
-  ],
-  decoration: const InputDecoration(
-    labelText: 'Pincode',
-    counterText: '',
-  ),
-),
+                controller: _pincodeCtrl,
+                validator: Validators.pincode,
+                keyboardType: TextInputType.number,
+                maxLength: 6,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                ],
+                decoration: const InputDecoration(
+                  labelText: 'Pincode',
+                  counterText: '',
+                ),
+              ),
 
               const SizedBox(height: 24),
 
-              /// ORDER SUMMARY
               const Text(
                 'Order Summary',
                 style: TextStyle(
@@ -295,7 +315,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
               const SizedBox(height: 24),
 
-              /// PAY BUTTON
               ElevatedButton(
                 onPressed: _proceed,
                 child: Text('Pay ${total.inr}'),

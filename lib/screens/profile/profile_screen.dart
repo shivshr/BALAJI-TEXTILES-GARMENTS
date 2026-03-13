@@ -55,8 +55,8 @@ class ProfileScreen extends ConsumerWidget {
             // Menu items
             _MenuItem(icon: Icons.shopping_bag_outlined, label: 'My Orders', onTap: () => context.push(AppRoutes.myOrders)),
             _MenuItem(icon: Icons.favorite_outline, label: 'Wishlist', onTap: () => context.push(AppRoutes.wishlist)),
-            _MenuItem(icon: Icons.location_on_outlined, label: 'Delivery Addresses', onTap: () {}),
-            _MenuItem(icon: Icons.notifications_outlined, label: 'Notifications', onTap: () {}),
+           _MenuItem(icon: Icons.location_on_outlined, label: 'Delivery Addresses', onTap: () => context.push(AppRoutes.deliveryAddresses),),
+            _MenuItem(icon: Icons.notifications_outlined, label: 'Notifications', onTap: () => context.push(AppRoutes.notifications),),
             _MenuItem(icon: Icons.help_outline, label: 'Help & Support', onTap: () {}),
             const Divider(height: 1),
             _MenuItem(

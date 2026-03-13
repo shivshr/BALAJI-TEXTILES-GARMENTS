@@ -22,6 +22,8 @@ import 'package:fashion_app/screens/wishlist/wishlist_screen.dart';
 import 'package:fashion_app/screens/kids/kids_category_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:fashion_app/screens/profile/delivery_addresses_screen.dart';
+import 'package:fashion_app/screens/profile/notifications_screen.dart';
 
 class AppRoutes {
   static const splash = '/';
@@ -33,6 +35,7 @@ class AppRoutes {
   static const cart = '/cart';
   static const wishlist = '/wishlist';
   static const profile = '/profile';
+  static const deliveryAddresses = '/delivery-addresses';
 
   static const productList = '/products';
   static const productDetail = '/product/:id';
@@ -51,6 +54,8 @@ class AppRoutes {
   static const orderManagement = '/admin/orders';
 
   static const kidsCategory = '/kids-category';
+  static const notifications = '/notifications';
+  
 }
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -97,6 +102,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(path: AppRoutes.wishlist,     builder: (_, __) => const WishlistScreen()),
           GoRoute(path: AppRoutes.profile,      builder: (_, __) => const ProfileScreen()),
           GoRoute(path: AppRoutes.kidsCategory, builder: (_, __) => const KidsCategoryScreen()),
+          GoRoute(path: AppRoutes.deliveryAddresses, builder: (_, __) => const DeliveryAddressesScreen(),),
+          GoRoute(path: AppRoutes.notifications,builder: (_, __) => const NotificationsScreen(),),
         ],
       ),
 
