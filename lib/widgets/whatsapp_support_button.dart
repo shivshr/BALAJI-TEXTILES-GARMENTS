@@ -63,18 +63,33 @@ class WhatsAppSupportButton extends StatelessWidget {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
+ @override
+Widget build(BuildContext context) {
+  return Positioned(
+    bottom: 90,
+    right: 16,
+    child: GestureDetector(
       onTap: _openWhatsApp,
-      child: SizedBox(
-        height: 55,
-        width: 55,
+      child: Container(
+        height: 60,
+        width: 60,
+        decoration: const BoxDecoration(
+          color: Colors.white, // background becomes white
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 8,
+              offset: Offset(0, 3),
+            )
+          ],
+        ),
+        padding: const EdgeInsets.all(12),
         child: Image.asset(
           "assets/images/whatsapp.png",
           fit: BoxFit.contain,
         ),
       ),
-    );
-  }
-}
+    ),
+  );
+}}

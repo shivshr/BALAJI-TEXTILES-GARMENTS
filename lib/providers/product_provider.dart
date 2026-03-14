@@ -1,55 +1,3 @@
-// import 'package:fashion_app/models/product_model.dart';
-// import 'package:fashion_app/services/product_service.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-// final productServiceProvider = Provider<ProductService>((ref) => ProductService());
-
-// final featuredProductsProvider = StreamProvider<List<ProductModel>>((ref) {
-//   return ref.watch(productServiceProvider).streamFeaturedProducts();
-// });
-
-// final allProductsProvider = StreamProvider<List<ProductModel>>((ref) {
-//   return ref.watch(productServiceProvider).streamAllProducts();
-// });
-
-// final productsByCategoryProvider = StreamProvider.family<List<ProductModel>, String>((ref, category) {
-//   return ref.watch(productServiceProvider).streamProductsByCategory(category);
-// });
-
-// final singleProductProvider = FutureProvider.family<ProductModel?, String>((ref, productId) {
-//   return ref.watch(productServiceProvider).getProduct(productId);
-// });
-
-// final searchQueryProvider = StateProvider<String>((ref) => '');
-// final searchCategoryProvider = StateProvider<String?>((ref) => null);
-// final searchInStockOnlyProvider = StateProvider<bool>((ref) => false);
-// final searchMinPriceProvider = StateProvider<double?>((ref) => null);
-// final searchMaxPriceProvider = StateProvider<double?>((ref) => null);
-
-// final searchResultsProvider = FutureProvider<List<ProductModel>>((ref) async {
-//   final query = ref.watch(searchQueryProvider);
-//   final category = ref.watch(searchCategoryProvider);
-//   final inStockOnly = ref.watch(searchInStockOnlyProvider);
-//   final minPrice = ref.watch(searchMinPriceProvider);
-//   final maxPrice = ref.watch(searchMaxPriceProvider);
-
-//   if (query.isEmpty && category == null) return [];
-
-//   return ref.watch(productServiceProvider).searchProducts(
-//         query: query.isEmpty ? null : query,
-//         category: category,
-//         minPrice: minPrice,
-//         maxPrice: maxPrice,
-//         inStockOnly: inStockOnly,
-//       );
-// });
-
-// // Admin
-// final adminProductsProvider = StreamProvider<List<ProductModel>>((ref) {
-//   return ref.watch(productServiceProvider).streamAdminProducts();
-// });
-
-
 import 'package:fashion_app/models/product_model.dart';
 import 'package:fashion_app/services/product_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -68,7 +16,7 @@ final productsByCategoryProvider = StreamProvider.family<List<ProductModel>, Str
   return ref.watch(productServiceProvider).streamProductsByCategory(category);
 });
 
-// Kids filter by gender + age_group
+// Kids filter
 class KidsFilter {
   final String gender;
   final String ageGroup;
@@ -93,30 +41,36 @@ final singleProductProvider = FutureProvider.family<ProductModel?, String>((ref,
   return ref.watch(productServiceProvider).getProduct(productId);
 });
 
-final searchQueryProvider = StateProvider<String>((ref) => '');
-final searchCategoryProvider = StateProvider<String?>((ref) => null);
+// ── Search providers ──────────────────────────────────────────────────────────
+final searchQueryProvider       = StateProvider<String>((ref) => '');
+final searchCategoryProvider    = StateProvider<String?>((ref) => null);
 final searchInStockOnlyProvider = StateProvider<bool>((ref) => false);
-final searchMinPriceProvider = StateProvider<double?>((ref) => null);
-final searchMaxPriceProvider = StateProvider<double?>((ref) => null);
 
-final searchResultsProvider = FutureProvider<List<ProductModel>>((ref) async {
-  final query = ref.watch(searchQueryProvider);
+// In-memory prefix search — uses allProductsProvider stream as base
+final searchResultsProvider = Provider<AsyncValue<List<ProductModel>>>((ref) {
+  final allAsync = ref.watch(allProductsProvider);
+  final query    = ref.watch(searchQueryProvider).toLowerCase().trim();
   final category = ref.watch(searchCategoryProvider);
-  final inStockOnly = ref.watch(searchInStockOnlyProvider);
-  final minPrice = ref.watch(searchMinPriceProvider);
-  final maxPrice = ref.watch(searchMaxPriceProvider);
 
-  if (query.isEmpty && category == null) return [];
+  return allAsync.whenData((all) {
+    // Nothing selected — return empty
+    if (query.isEmpty && category == null) return all;
 
-  return ref.watch(productServiceProvider).searchProducts(
-        query: query.isEmpty ? null : query,
-        category: category,
-        minPrice: minPrice,
-        maxPrice: maxPrice,
-        inStockOnly: inStockOnly,
-      );
+    return all.where((p) {
+      // Category filter
+      final catMatch = category == null || p.category == category;
+
+      // Prefix match on name words
+      final nameMatch = query.isEmpty ||
+          p.name.toLowerCase().startsWith(query) ||
+          p.name.toLowerCase().split(' ').any((w) => w.startsWith(query));
+
+      return catMatch && nameMatch;
+    }).toList();
+  });
 });
 
+// Admin
 final adminProductsProvider = StreamProvider<List<ProductModel>>((ref) {
   return ref.watch(productServiceProvider).streamAdminProducts();
 });

@@ -49,7 +49,7 @@ class _BannerCarouselState extends State<BannerCarousel> {
         CarouselSlider.builder(
           itemCount: _banners.length,
           options: CarouselOptions(
-            height: 160, // better banner height
+            height: 220, // better banner height
             viewportFraction: 0.92, // slight side preview
             autoPlay: true,
             autoPlayInterval: const Duration(seconds: 4),
@@ -69,7 +69,7 @@ class _BannerCarouselState extends State<BannerCarousel> {
         child: Image.asset(
           b['image'],
           width: double.infinity,
-          fit: BoxFit.cover,
+          fit: BoxFit.fitWidth,
         ),
       ),
     );

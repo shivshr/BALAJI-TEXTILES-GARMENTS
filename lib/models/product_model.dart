@@ -81,7 +81,7 @@ class ProductModel {
       subCategory:  map['sub_category'] ?? '',
       gender:       map['gender'],
       ageGroup:     map['age_group'],
-      age:          map['age'],           // NEW
+      age:          map['age'] != null ? int.tryParse(map['age'].toString()) : null,          // NEW
       tags:         List<String>.from(map['tags'] ?? []),
       imageUrls:    List<String>.from(map['image_urls'] ?? []),
       sizes:        List<String>.from(map['sizes'] ?? []),
