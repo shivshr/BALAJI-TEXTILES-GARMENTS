@@ -68,23 +68,19 @@ class OrderService {
     });
   }
 
-  Future<Map<String, dynamic>> getAdminStats(DateTime month) async {
-
-  final start = DateTime(month.year, month.month, 1);
-  final end = DateTime(month.year, month.month + 1, 1);
+  Future<Map<String, dynamic>> getAdminStats(DateTime start, DateTime end) async {
+  final endPlusOne = end.add(const Duration(days: 1)); // end date inclusive
 
   final snap = await _col
-      .where('created_at', isGreaterThanOrEqualTo: start)
-      .where('created_at', isLessThan: end)
+      .where('created_at', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
+      .where('created_at', isLessThan: Timestamp.fromDate(endPlusOne))
       .get();
 
   double total = 0;
   int paid = 0;
 
   for (final doc in snap.docs) {
-
     final data = doc.data() as Map<String, dynamic>;
-
     if (data['payment_status'] == 'paid') {
       total += (data['total_price'] ?? 0).toDouble();
       paid++;

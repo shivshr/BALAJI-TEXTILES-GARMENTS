@@ -339,7 +339,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                         ),
                         itemBuilder: (_, i, __) => CachedNetworkImage(
                           imageUrl: product.imageUrls[i],
-                          fit: BoxFit.cover,
+                          fit: BoxFit.contain,
                           width: double.infinity,
                           placeholder: (_, __) => Container(color: AppColors.shimmerBase),
                           errorWidget: (_, __, ___) => Container(

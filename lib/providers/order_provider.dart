@@ -19,7 +19,10 @@ final singleOrderProvider = FutureProvider.family<OrderModel?, String>((ref, ord
   return ref.watch(orderServiceProvider).getOrder(orderId);
 });
 
+// ── Date range record type ──
+typedef DateRange = ({DateTime start, DateTime end});
+
 final adminStatsProvider =
-    FutureProvider.family<Map<String, dynamic>, DateTime>((ref, month) {
-  return ref.watch(orderServiceProvider).getAdminStats(month);
+    FutureProvider.family<Map<String, dynamic>, DateRange>((ref, range) {
+  return ref.watch(orderServiceProvider).getAdminStats(range.start, range.end);
 });
