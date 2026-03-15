@@ -144,6 +144,18 @@ class ProductService {
         .map((s) => s.docs.map((d) => ProductModel.fromDoc(d)).toList());
   }
 
+  /// NEW METHOD (subcategory filter)
+  Stream<List<ProductModel>> streamProductsBySubCategory(
+      String category, String subcategory) {
+    return _col
+        .where('is_active', isEqualTo: true)
+        .where('category', isEqualTo: category)
+        .where('subcategory', isEqualTo: subcategory)
+        .orderBy('created_at', descending: true)
+        .snapshots()
+        .map((s) => s.docs.map((d) => ProductModel.fromDoc(d)).toList());
+  }
+
   // Kids products filtered by gender + age_group
   Stream<List<ProductModel>> streamKidsProducts({
     required String gender,
@@ -188,15 +200,25 @@ class ProductService {
     bool inStockOnly = false,
   }) async {
     Query q = _col.where('is_active', isEqualTo: true);
+
     if (category != null && category.isNotEmpty) {
       q = q.where('category', isEqualTo: category);
     }
+
     if (inStockOnly) q = q.where('in_stock', isEqualTo: true);
-    if (minPrice != null) q = q.where('price', isGreaterThanOrEqualTo: minPrice);
-    if (maxPrice != null) q = q.where('price', isLessThanOrEqualTo: maxPrice);
+
+    if (minPrice != null) {
+      q = q.where('price', isGreaterThanOrEqualTo: minPrice);
+    }
+
+    if (maxPrice != null) {
+      q = q.where('price', isLessThanOrEqualTo: maxPrice);
+    }
+
     if (query != null && query.isNotEmpty) {
       q = q.where('tags', arrayContains: query.toLowerCase().trim());
     }
+
     final snap = await q.limit(50).get();
     return snap.docs.map((d) => ProductModel.fromDoc(d)).toList();
   }
@@ -209,7 +231,8 @@ class ProductService {
     return doc.id;
   }
 
-  Future<void> updateProduct(String productId, Map<String, dynamic> data) async {
+  Future<void> updateProduct(
+      String productId, Map<String, dynamic> data) async {
     data['updated_at'] = FieldValue.serverTimestamp();
     await _col.doc(productId).update(data);
   }
@@ -221,7 +244,8 @@ class ProductService {
     });
   }
 
-  Future<void> toggleProductActive(String productId, bool isActive) async {
+  Future<void> toggleProductActive(
+      String productId, bool isActive) async {
     await _col.doc(productId).update({
       'is_active': isActive,
       'updated_at': FieldValue.serverTimestamp(),
@@ -230,10 +254,13 @@ class ProductService {
 
   Future<void> decrementStock(String productId, int quantity) async {
     final ref = _col.doc(productId);
+
     await _db.runTransaction((transaction) async {
       final snap = await transaction.get(ref);
+
       final current = (snap['stock'] as int?) ?? 0;
       final newStock = (current - quantity).clamp(0, 999999);
+
       transaction.update(ref, {
         'stock': newStock,
         'in_stock': newStock > 0,

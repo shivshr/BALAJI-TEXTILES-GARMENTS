@@ -78,7 +78,7 @@ class ProductModel {
       price:        (map['price'] ?? 0).toDouble(),
       comparePrice: map['compare_price']?.toDouble(),
       category:     map['category'] ?? '',
-      subCategory:  map['sub_category'] ?? '',
+      subCategory: map['subcategory'] ?? map['sub_category'] ?? '',
       gender:       map['gender'],
       ageGroup:     map['age_group'],
       age:          map['age'] != null ? int.tryParse(map['age'].toString()) : null,          // NEW
@@ -112,7 +112,7 @@ class ProductModel {
       'price':         price,
       'compare_price': comparePrice,
       'category':      category,
-      'sub_category':  subCategory,
+      'subcategory':  subCategory,///previous 'sub_category':  subCategory,
       'gender':        gender,
       'age_group':     ageGroup,
       'age':           age,             // NEW

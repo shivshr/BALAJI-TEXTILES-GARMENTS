@@ -79,9 +79,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ProductListScreen extends ConsumerWidget {
   final String? category;
+  final String? subcategory;
   final Map<String, dynamic>? filters;
 
-  const ProductListScreen({this.category, this.filters, super.key});
+  const ProductListScreen({this.category, this.subcategory, this.filters, super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -93,9 +94,17 @@ class ProductListScreen extends ConsumerWidget {
             gender: filters!['gender'] as String,
             ageGroup: filters!['age_group'] as String,
           )))
-        : category != null
-            ? ref.watch(productsByCategoryProvider(category!))
-            : ref.watch(allProductsProvider);
+        : (category != null && subcategory != null)
+    ? ref.watch(productsBySubCategoryProvider(
+  CategoryFilter(
+    category: category!,
+    subcategory: subcategory!,
+  ),
+))
+
+    : category != null
+        ? ref.watch(productsByCategoryProvider(category!))
+        : ref.watch(allProductsProvider);
 
     final title = filters?['title'] as String? ??
         (category != null ? category!.toUpperCase() : 'All Products');

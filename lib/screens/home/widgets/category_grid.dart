@@ -1,6 +1,7 @@
 import 'package:fashion_app/core/constants/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:fashion_app/screens/home/subcategory_screen.dart';
 
 class CategoryGrid extends StatelessWidget {
   const CategoryGrid({super.key});
@@ -51,10 +52,17 @@ class CategoryGrid extends StatelessWidget {
           return GestureDetector(
             onTap: () {
   if (cat['key'] == 'kids') {
-    context.push(AppRoutes.kidsCategory);
-  } else {
-    context.push(AppRoutes.productList, extra: cat['key']);
-  }
+  context.push(AppRoutes.kidsCategory);
+} else if (cat['key'] == 'men' || cat['key'] == 'women') {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => SubCategoryScreen(category: cat['key']),
+    ),
+  );
+} else {
+  context.push(AppRoutes.productList, extra: cat['key']);
+}
 },
             child: Container(
   decoration: BoxDecoration(

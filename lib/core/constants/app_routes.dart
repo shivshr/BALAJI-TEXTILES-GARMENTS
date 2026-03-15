@@ -108,15 +108,33 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
 
       GoRoute(
-        path: AppRoutes.productList,
-        builder: (_, state) {
-          final extra = state.extra;
-          if (extra is Map<String, dynamic> && extra.containsKey('gender')) {
-            return ProductListScreen(filters: extra);
-          }
-          return ProductListScreen(category: extra as String?);
-        },
-      ),
+  path: AppRoutes.productList,
+  builder: (_, state) {
+    final extra = state.extra;
+
+    // Kids filters (existing functionality)
+    if (extra is Map<String, dynamic> && extra.containsKey('gender')) {
+      return ProductListScreen(filters: extra);
+    }
+
+    // Subcategory navigation (NEW)
+    if (extra is Map<String, dynamic> &&
+        extra.containsKey('category') &&
+        extra.containsKey('subcategory')) {
+      return ProductListScreen(
+        category: extra['category'],
+        subcategory: extra['subcategory'],
+      );
+    }
+
+    // Normal category navigation (existing functionality)
+    if (extra is String) {
+      return ProductListScreen(category: extra);
+    }
+
+    return const ProductListScreen();
+  },
+),
       GoRoute(
         path: AppRoutes.productDetail,
         builder: (_, state) => ProductDetailScreen(
