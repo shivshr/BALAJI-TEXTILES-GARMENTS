@@ -19,6 +19,7 @@ final singleOrderProvider = FutureProvider.family<OrderModel?, String>((ref, ord
   return ref.watch(orderServiceProvider).getOrder(orderId);
 });
 
-final adminStatsProvider = FutureProvider<Map<String, dynamic>>((ref) {
-  return ref.watch(orderServiceProvider).getAdminStats();
+final adminStatsProvider =
+    FutureProvider.family<Map<String, dynamic>, DateTime>((ref, month) {
+  return ref.watch(orderServiceProvider).getAdminStats(month);
 });
