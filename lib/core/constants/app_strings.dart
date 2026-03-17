@@ -1,7 +1,7 @@
 class AppStrings {
   AppStrings._();
 
-  static const String appName = 'FashionApp';
+  static const String appName = 'FBalaji Textile And Garments';
   static const String tagline = 'Style at your doorstep';
 
   // Auth

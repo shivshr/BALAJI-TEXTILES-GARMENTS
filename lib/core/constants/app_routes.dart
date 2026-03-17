@@ -1,29 +1,30 @@
-import 'package:fashion_app/providers/auth_provider.dart';
-import 'package:fashion_app/screens/admin/admin_dashboard_screen.dart';
-import 'package:fashion_app/screens/admin/admin_login_screen.dart';
-import 'package:fashion_app/screens/admin/add_product_screen.dart';
-import 'package:fashion_app/screens/admin/manage_products_screen.dart';
-import 'package:fashion_app/screens/admin/order_management_screen.dart';
-import 'package:fashion_app/screens/auth/otp_verify_screen.dart';
-import 'package:fashion_app/screens/auth/phone_login_screen.dart';
-import 'package:fashion_app/screens/cart/cart_screen.dart';
-import 'package:fashion_app/screens/checkout/checkout_screen.dart';
-import 'package:fashion_app/screens/checkout/order_confirmation_screen.dart';
-import 'package:fashion_app/screens/checkout/payment_screen.dart';
-import 'package:fashion_app/screens/home/home_screen.dart';
-import 'package:fashion_app/screens/orders/my_orders_screen.dart';
-import 'package:fashion_app/screens/orders/order_detail_screen.dart';
-import 'package:fashion_app/screens/products/product_detail_screen.dart';
-import 'package:fashion_app/screens/products/product_list_screen.dart';
-import 'package:fashion_app/screens/products/search_screen.dart';
-import 'package:fashion_app/screens/profile/profile_screen.dart';
-import 'package:fashion_app/screens/splash/splash_screen.dart';
-import 'package:fashion_app/screens/wishlist/wishlist_screen.dart';
-import 'package:fashion_app/screens/kids/kids_category_screen.dart';
+import 'package:balaji_textile_and_garments/providers/auth_provider.dart';
+import 'package:balaji_textile_and_garments/screens/admin/admin_dashboard_screen.dart';
+import 'package:balaji_textile_and_garments/screens/admin/admin_login_screen.dart';
+import 'package:balaji_textile_and_garments/screens/admin/add_product_screen.dart';
+import 'package:balaji_textile_and_garments/screens/admin/manage_products_screen.dart';
+import 'package:balaji_textile_and_garments/screens/admin/order_management_screen.dart';
+import 'package:balaji_textile_and_garments/screens/auth/otp_verify_screen.dart';
+import 'package:balaji_textile_and_garments/screens/auth/phone_login_screen.dart';
+import 'package:balaji_textile_and_garments/screens/cart/cart_screen.dart';
+import 'package:balaji_textile_and_garments/screens/checkout/checkout_screen.dart';
+import 'package:balaji_textile_and_garments/screens/checkout/order_confirmation_screen.dart';
+import 'package:balaji_textile_and_garments/screens/checkout/payment_screen.dart';
+import 'package:balaji_textile_and_garments/screens/home/home_screen.dart';
+import 'package:balaji_textile_and_garments/screens/orders/my_orders_screen.dart';
+import 'package:balaji_textile_and_garments/screens/orders/order_detail_screen.dart';
+import 'package:balaji_textile_and_garments/screens/products/product_detail_screen.dart';
+import 'package:balaji_textile_and_garments/screens/products/product_list_screen.dart';
+import 'package:balaji_textile_and_garments/screens/products/search_screen.dart';
+import 'package:balaji_textile_and_garments/screens/profile/profile_screen.dart';
+import 'package:balaji_textile_and_garments/screens/splash/splash_screen.dart';
+import 'package:balaji_textile_and_garments/screens/wishlist/wishlist_screen.dart';
+import 'package:balaji_textile_and_garments/screens/kids/kids_category_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:fashion_app/screens/profile/delivery_addresses_screen.dart';
-import 'package:fashion_app/screens/profile/notifications_screen.dart';
+import 'package:balaji_textile_and_garments/screens/profile/delivery_addresses_screen.dart';
+import 'package:balaji_textile_and_garments/screens/profile/notifications_screen.dart';
+import 'package:balaji_textile_and_garments/screens/admin/banner_management_screen.dart';
 
 class AppRoutes {
   static const splash = '/';
@@ -55,6 +56,7 @@ class AppRoutes {
 
   static const kidsCategory = '/kids-category';
   static const notifications = '/notifications';
+  static const manageBanners = '/admin/banners';
   
 }
 
@@ -71,6 +73,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.phoneLogin,
         builder: (_, __) => const PhoneLoginScreen(),
       ),
+      GoRoute(
+  path: AppRoutes.manageBanners,
+  builder: (context, state) => const BannerManagementScreen(),
+),
       GoRoute(
         path: AppRoutes.otpVerify,
         builder: (_, state) {

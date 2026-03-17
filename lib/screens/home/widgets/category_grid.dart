@@ -1,7 +1,7 @@
-import 'package:fashion_app/core/constants/app_routes.dart';
+import 'package:balaji_textile_and_garments/core/constants/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:fashion_app/screens/home/subcategory_screen.dart';
+import 'package:balaji_textile_and_garments/screens/home/subcategory_screen.dart';
 
 class CategoryGrid extends StatelessWidget {
   const CategoryGrid({super.key});

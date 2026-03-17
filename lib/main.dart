@@ -1,4 +1,4 @@
-import 'package:fashion_app/app.dart';
+import 'package:balaji_textile_and_garments/app.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

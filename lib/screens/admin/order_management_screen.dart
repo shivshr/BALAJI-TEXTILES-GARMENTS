@@ -1,7 +1,7 @@
-import 'package:fashion_app/core/constants/app_colors.dart';
-import 'package:fashion_app/core/utils/extensions.dart';
-import 'package:fashion_app/providers/order_provider.dart';
-import 'package:fashion_app/services/order_service.dart';
+import 'package:balaji_textile_and_garments/core/constants/app_colors.dart';
+import 'package:balaji_textile_and_garments/core/utils/extensions.dart';
+import 'package:balaji_textile_and_garments/providers/order_provider.dart';
+import 'package:balaji_textile_and_garments/services/order_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

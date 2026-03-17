@@ -177,9 +177,9 @@
 
 
 
-import 'package:fashion_app/core/constants/app_colors.dart';
-import 'package:fashion_app/providers/product_provider.dart';
-import 'package:fashion_app/widgets/product_card.dart';
+import 'package:balaji_textile_and_garments/core/constants/app_colors.dart';
+import 'package:balaji_textile_and_garments/providers/product_provider.dart';
+import 'package:balaji_textile_and_garments/widgets/product_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

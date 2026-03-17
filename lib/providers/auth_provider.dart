@@ -1,5 +1,5 @@
-import 'package:fashion_app/models/user_model.dart';
-import 'package:fashion_app/services/auth_service.dart';
+import 'package:balaji_textile_and_garments/models/user_model.dart';
+import 'package:balaji_textile_and_garments/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

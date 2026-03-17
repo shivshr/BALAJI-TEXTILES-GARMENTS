@@ -1,4 +1,4 @@
-import 'package:fashion_app/core/utils/extensions.dart';
+import 'package:balaji_textile_and_garments/core/utils/extensions.dart';
 import 'package:flutter/material.dart';
 
 class StockBadge extends StatelessWidget {

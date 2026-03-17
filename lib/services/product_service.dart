@@ -120,7 +120,7 @@
 //   }
 // }
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fashion_app/models/product_model.dart';
+import 'package:balaji_textile_and_garments/models/product_model.dart';
 
 class ProductService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;

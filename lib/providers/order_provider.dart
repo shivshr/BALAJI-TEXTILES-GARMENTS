@@ -1,6 +1,6 @@
-import 'package:fashion_app/models/order_model.dart';
-import 'package:fashion_app/providers/auth_provider.dart';
-import 'package:fashion_app/services/order_service.dart';
+import 'package:balaji_textile_and_garments/models/order_model.dart';
+import 'package:balaji_textile_and_garments/providers/auth_provider.dart';
+import 'package:balaji_textile_and_garments/services/order_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final orderServiceProvider = Provider<OrderService>((ref) => OrderService());

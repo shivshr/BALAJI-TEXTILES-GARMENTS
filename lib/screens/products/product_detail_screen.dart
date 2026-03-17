@@ -278,14 +278,14 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:fashion_app/core/constants/app_colors.dart';
-import 'package:fashion_app/core/constants/app_routes.dart';
-import 'package:fashion_app/core/utils/extensions.dart';
-import 'package:fashion_app/models/cart_item_model.dart';
-import 'package:fashion_app/providers/cart_provider.dart';
-import 'package:fashion_app/providers/product_provider.dart';
-import 'package:fashion_app/providers/wishlist_provider.dart';
-import 'package:fashion_app/widgets/stock_badge.dart';
+import 'package:balaji_textile_and_garments/core/constants/app_colors.dart';
+import 'package:balaji_textile_and_garments/core/constants/app_routes.dart';
+import 'package:balaji_textile_and_garments/core/utils/extensions.dart';
+import 'package:balaji_textile_and_garments/models/cart_item_model.dart';
+import 'package:balaji_textile_and_garments/providers/cart_provider.dart';
+import 'package:balaji_textile_and_garments/providers/product_provider.dart';
+import 'package:balaji_textile_and_garments/providers/wishlist_provider.dart';
+import 'package:balaji_textile_and_garments/widgets/stock_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -519,30 +519,40 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: ElevatedButton(
-                    onPressed: product.inStock
-                        ? () {
-                            if (product.sizes.isNotEmpty && _selectedSize == null) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Please select a size')),
-                              );
-                              return;
-                            }
-                            ref.read(cartProvider.notifier).addItem(CartItemModel(
-                                  productId: product.productId,
-                                  name: product.name,
-                                  imageUrl: product.imageUrls.isNotEmpty ? product.imageUrls.first : '',
-                                  price: product.price,
-                                  quantity: 1,
-                                  selectedSize: _selectedSize ?? '',
-                                  availableStock: product.stock,
-                                ));
-                            context.go(AppRoutes.cart);
-                          }
-                        : null,
-                    child: product.inStock ? const Text('Buy Now') : const Text('Out of Stock'),
-                  ),
-                ),
+  child: ElevatedButton(
+    onPressed: product.inStock
+        ? () {
+            if (product.sizes.isNotEmpty && _selectedSize == null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Please select a size')),
+              );
+              return;
+            }
+
+            /// 🚀 BUY NOW FLOW (NO CART TOUCH)
+            context.push(
+  AppRoutes.checkout,
+  extra: {
+    'buyNowItem': CartItemModel(
+      productId: product.productId,
+      name: product.name,
+      imageUrl: product.imageUrls.isNotEmpty
+          ? product.imageUrls.first
+          : '',
+      price: product.price,
+      quantity: 1,
+      selectedSize: _selectedSize ?? '',
+      availableStock: product.stock,
+    ),
+  },
+);
+          }
+        : null,
+    child: product.inStock
+        ? const Text('Buy Now')
+        : const Text('Out of Stock'),
+  ),
+),
               ],
             ),
           ),

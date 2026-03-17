@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fashion_app/models/cart_item_model.dart';
-import 'package:fashion_app/models/user_model.dart';
+import 'package:balaji_textile_and_garments/models/cart_item_model.dart';
+import 'package:balaji_textile_and_garments/models/user_model.dart';
 
 class OrderModel {
   final String orderId;

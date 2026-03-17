@@ -46,8 +46,8 @@ class PaymentService {
     final options = <String, dynamic>{
       'key': _razorpayKey,
       'amount': (amount * 100).toInt(), // Convert to paise
-      'name': 'FashionApp',
-      'description': description ?? 'Fashion Order',
+      'name': 'Balaji Textiles & Garments',
+      'description': description ?? 'Balaji Textiles Orders',
       'prefill': {
         'contact': phone,
         if (email != null) 'email': email,

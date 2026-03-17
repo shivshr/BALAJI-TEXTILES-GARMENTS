@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fashion_app/providers/auth_provider.dart';
+import 'package:balaji_textile_and_garments/providers/auth_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class WishlistNotifier extends StateNotifier<List<String>> {

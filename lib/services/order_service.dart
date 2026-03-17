@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fashion_app/models/order_model.dart';
-import 'package:fashion_app/services/notification_service.dart';
-import 'package:fashion_app/services/product_service.dart';
+import 'package:balaji_textile_and_garments/models/order_model.dart';
+import 'package:balaji_textile_and_garments/services/notification_service.dart';
+import 'package:balaji_textile_and_garments/services/product_service.dart';
 
 class OrderService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;

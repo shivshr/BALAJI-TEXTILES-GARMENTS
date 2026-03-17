@@ -1,8 +1,9 @@
-import 'package:fashion_app/core/constants/app_routes.dart';
-import 'package:fashion_app/core/theme/app_theme.dart';
-import 'package:fashion_app/providers/auth_provider.dart';
+import 'package:balaji_textile_and_garments/core/constants/app_routes.dart';
+import 'package:balaji_textile_and_garments/core/theme/app_theme.dart';
+import 'package:balaji_textile_and_garments/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 
 class FashionApp extends ConsumerWidget {
   const FashionApp({super.key});

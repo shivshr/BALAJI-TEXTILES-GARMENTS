@@ -1,5 +1,5 @@
-import 'package:fashion_app/core/constants/app_colors.dart';
-import 'package:fashion_app/core/constants/app_routes.dart';
+import 'package:balaji_textile_and_garments/core/constants/app_colors.dart';
+import 'package:balaji_textile_and_garments/core/constants/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

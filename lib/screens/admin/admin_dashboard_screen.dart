@@ -1,8 +1,8 @@
-import 'package:fashion_app/core/constants/app_colors.dart';
-import 'package:fashion_app/core/constants/app_routes.dart';
-import 'package:fashion_app/core/utils/extensions.dart';
-import 'package:fashion_app/providers/auth_provider.dart';
-import 'package:fashion_app/providers/order_provider.dart';
+import 'package:balaji_textile_and_garments/core/constants/app_colors.dart';
+import 'package:balaji_textile_and_garments/core/constants/app_routes.dart';
+import 'package:balaji_textile_and_garments/core/utils/extensions.dart';
+import 'package:balaji_textile_and_garments/providers/auth_provider.dart';
+import 'package:balaji_textile_and_garments/providers/order_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -247,6 +247,8 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                     AppColors.warning, () => context.push(AppRoutes.orderManagement)),
                 _ActionCard('Customer App', Icons.phone_android_rounded,
                     AppColors.success, () => context.go(AppRoutes.home)),
+                _ActionCard('Manage Banners',Icons.image_outlined,
+                    AppColors.success,() => context.push(AppRoutes.manageBanners),),
               ],
             ),
 

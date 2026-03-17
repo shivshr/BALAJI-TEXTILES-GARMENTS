@@ -758,14 +758,14 @@
 // }
 
 
-import 'package:fashion_app/core/constants/app_colors.dart';
-import 'package:fashion_app/core/constants/app_routes.dart';
-import 'package:fashion_app/providers/auth_provider.dart';
-import 'package:fashion_app/providers/product_provider.dart';
-import 'package:fashion_app/providers/location_provider.dart';
-import 'package:fashion_app/screens/home/widgets/banner_carousel.dart';
-import 'package:fashion_app/screens/home/widgets/category_grid.dart';
-import 'package:fashion_app/screens/home/widgets/featured_products.dart';
+import 'package:balaji_textile_and_garments/core/constants/app_colors.dart';
+import 'package:balaji_textile_and_garments/core/constants/app_routes.dart';
+import 'package:balaji_textile_and_garments/providers/auth_provider.dart';
+import 'package:balaji_textile_and_garments/providers/product_provider.dart';
+import 'package:balaji_textile_and_garments/providers/location_provider.dart';
+import 'package:balaji_textile_and_garments/screens/home/widgets/banner_carousel.dart';
+import 'package:balaji_textile_and_garments/screens/home/widgets/category_grid.dart';
+import 'package:balaji_textile_and_garments/screens/home/widgets/featured_products.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';

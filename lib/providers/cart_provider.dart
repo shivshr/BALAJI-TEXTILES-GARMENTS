@@ -1,4 +1,4 @@
-import 'package:fashion_app/models/cart_item_model.dart';
+import 'package:balaji_textile_and_garments/models/cart_item_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CartNotifier extends StateNotifier<List<CartItemModel>> {

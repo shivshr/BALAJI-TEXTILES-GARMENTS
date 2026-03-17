@@ -1,5 +1,5 @@
-import 'package:fashion_app/models/product_model.dart';
-import 'package:fashion_app/services/product_service.dart';
+import 'package:balaji_textile_and_garments/models/product_model.dart';
+import 'package:balaji_textile_and_garments/services/product_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final productServiceProvider =

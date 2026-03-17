@@ -74,7 +74,7 @@ Widget build(BuildContext context) {
         height: 60,
         width: 60,
         decoration: const BoxDecoration(
-          color: Colors.white, // background becomes white
+          color: Color.fromARGB(255, 246, 244, 244), // background becomes white
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(

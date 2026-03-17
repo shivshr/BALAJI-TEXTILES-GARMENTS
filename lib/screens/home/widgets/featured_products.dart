@@ -1,5 +1,5 @@
-import 'package:fashion_app/models/product_model.dart';
-import 'package:fashion_app/widgets/product_card.dart';
+import 'package:balaji_textile_and_garments/models/product_model.dart';
+import 'package:balaji_textile_and_garments/widgets/product_card.dart';
 import 'package:flutter/material.dart';
 
 class FeaturedProductsRow extends StatelessWidget {
