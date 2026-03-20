@@ -68,7 +68,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
 
   final _categories    = ['men', 'women', 'kids', 'ethnic'];
   final _genders       = ['boy', 'girl'];
-  final _ethnicGenders = ['men', 'women'];
+  final _ethnicGenders = ['men', 'women', 'boys', 'girls'];
 
   final _ageGroups = [
     '0-3 Months', '4-6 Months', '7-9 Months', '10-12 Months',
@@ -89,9 +89,11 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
   // Ethnic ke liye gender-based subcategories, baaki normal
   List<String> get _currentSubCategories {
     if (_category == 'ethnic') {
-      if (_gender == null) return [];
-      return kSubCategories['ethnic_$_gender'] ?? [];
-    }
+  if (_gender == 'men' || _gender == 'women') {
+    return kSubCategories['ethnic_$_gender'] ?? [];
+  }
+  return []; // boys/girls → no product types
+}
     return kSubCategories[_category] ?? [];
   }
 
@@ -124,10 +126,22 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
       if (_ageOptions != null && _age == null) { _showError('Please select age'); return; }
     }
 
-    if (_category == 'ethnic' && _gender == null) {
-      _showError('Please select Men or Women for Ethnic');
-      return;
-    }
+    if (_category == 'ethnic') {
+  if (_gender == null) {
+    _showError('Please select Men/Women/Boys/Girls');
+    return;
+  }
+
+  if ((_gender == 'men' || _gender == 'women') && _subCategory == null) {
+    _showError('Please select product type');
+    return;
+  }
+
+  if ((_gender == 'boys' || _gender == 'girls') && _ageGroup == null) {
+    _showError('Please select age group');
+    return;
+  }
+}
 
     setState(() => _saving = true);
 
@@ -151,7 +165,10 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         category:    _category,
         subCategory: _subCategory ?? '',
         gender:      (_category == 'kids' || _category == 'ethnic') ? _gender : null,
-        ageGroup:    _category == 'kids' ? _ageGroup : null,
+        ageGroup: (_category == 'kids' || 
+          (_category == 'ethnic' && (_gender == 'boys' || _gender == 'girls')))
+    ? _ageGroup
+    : null,
         age:         _category == 'kids' ? _age      : null,
         tags:        tags,
         imageUrls:   _imageUrls,
@@ -391,31 +408,57 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                     labelText: 'Step 1 — Men or Women?',
                     prefixIcon: Icon(Icons.wc_outlined),
                   ),
-                  items: _ethnicGenders.map((g) => DropdownMenuItem(
-                    value: g,
-                    child: Row(
-                      children: [
-                        Icon(
-                          g == 'men' ? Icons.male : Icons.female,
-                          size: 18,
-                          color: g == 'men' ? Colors.blue : Colors.pink,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          g == 'men' ? 'Men Ethnic' : 'Women Ethnic',
-                          style: const TextStyle(fontWeight: FontWeight.w500),
-                        ),
-                      ],
-                    ),
-                  )).toList(),
+                 items: _ethnicGenders.map((g) => DropdownMenuItem(
+  value: g,
+  child: Row(
+    children: [
+      Icon(
+        g == 'men' || g == 'boys' ? Icons.male : Icons.female,
+        size: 18,
+        color: g == 'men' || g == 'boys' ? Colors.blue : Colors.pink,
+      ),
+      const SizedBox(width: 8),
+      Text(
+        g == 'men'
+            ? 'Men Ethnic'
+            : g == 'women'
+                ? 'Women Ethnic'
+                : g == 'boys'
+                    ? 'Boys Ethnic'
+                    : 'Girls Ethnic',
+        style: const TextStyle(fontWeight: FontWeight.w500),
+      ),
+    ],
+  ),
+)).toList(),
                   onChanged: (v) => setState(() {
                     _gender      = v;
                     _subCategory = null;
                   }),
                 ),
 
+              // STEP 2 — Age Group (ONLY Boys/Girls)
+if (_gender == 'boys' || _gender == 'girls') ...[
+  const SizedBox(height: 12),
+  DropdownButtonFormField<String>(
+    value: _ageGroup,
+    decoration: const InputDecoration(
+      labelText: 'Step 2 — Select Age Group',
+      prefixIcon: Icon(Icons.cake_outlined),
+    ),
+    items: _ageGroups.map((a) => DropdownMenuItem(
+      value: a,
+      child: Text(a),
+    )).toList(),
+    onChanged: (v) => setState(() {
+      _ageGroup = v;
+      _subCategory = null; // safety
+    }),
+  ),
+],
+
                 // STEP 2 — SubCategory (only after gender selected)
-                if (_gender != null) ...[
+                if (_gender == 'men' || _gender == 'women') ...[
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
                     value: _subCategory,
