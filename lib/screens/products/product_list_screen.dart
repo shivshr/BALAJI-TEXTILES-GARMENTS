@@ -99,23 +99,56 @@ class _ProductListScreenState
 
   String _selectedGenderFilter = 'all';
   String? _selectedAgeFilter;
+  int? _selectedExactAge;
 
   final List<String> _ageOptions = [
-  '0-3 Months',
-  '4-6 Months',
-  '7-9 Months',
-  '10-12 Months',
-  '1-2 Years',
-  '3-5 Years',
-  '6-8 Years',
-  '9-11 Years',
-  '12-14 Years',
-];
+    '0-3 Months',
+    '4-6 Months',
+    '7-9 Months',
+    '10-12 Months',
+    '1-2 Years',
+    '3-5 Years',
+    '6-8 Years',
+    '9-11 Years',
+    '12-14 Years',
+  ];
+
+  // ✅ IMPORTANT: initialize filters from navigation
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.filters != null) {
+      _selectedGenderFilter = widget.filters!['gender'] ?? 'all';
+      _selectedAgeFilter = widget.filters!['age_group'];
+    }
+  }
+
+  // ✅ Age breakdown
+  List<int> _getAgeOptionsFromGroup(String? ageGroup) {
+    switch (ageGroup) {
+      case '1-2 Years':
+        return [1, 2];
+      case '3-5 Years':
+        return [3, 4, 5];
+      case '6-8 Years':
+        return [6, 7, 8];
+      case '9-11 Years':
+        return [9, 10, 11];
+      case '12-14 Years':
+        return [12, 13, 14];
+      default:
+        return [];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final isKidsFilter =
         widget.filters != null && widget.filters!.containsKey('gender');
+
+    final isPreFiltered = widget.filters != null &&
+    widget.filters!.containsKey('age_group');
 
     final productsAsync = isKidsFilter
         ? ref.watch(productsByKidsFilterProvider(KidsFilter(
@@ -151,22 +184,26 @@ class _ProductListScreenState
       body: productsAsync.when(
         data: (products) {
 
-          // 🔥 APPLY FILTER LOGIC
+          // ✅ FILTER LOGIC
           final filteredProducts = products.where((p) {
 
-            // Gender filter
             if (widget.category == 'ethnic' &&
                 _selectedGenderFilter != 'all' &&
                 p.gender != _selectedGenderFilter) {
               return false;
             }
 
-            // Age filter (only boys/girls)
-            if ((_selectedGenderFilter == 'boys' ||
-                    _selectedGenderFilter == 'girls') &&
-                _selectedAgeFilter != null) {
-              return (p.ageGroup ?? '').toLowerCase() ==
-       (_selectedAgeFilter ?? '').toLowerCase();
+            if ((_selectedGenderFilter == 'boy' ||
+                    _selectedGenderFilter == 'girl') &&
+                _selectedAgeFilter != null &&
+                (p.ageGroup ?? '').toLowerCase() !=
+                    _selectedAgeFilter!.toLowerCase()) {
+              return false;
+            }
+
+            if (_selectedExactAge != null &&
+                p.age != _selectedExactAge) {
+              return false;
             }
 
             return true;
@@ -175,7 +212,7 @@ class _ProductListScreenState
           return Column(
             children: [
 
-              // 🔥 GENDER FILTER BAR
+              // 🔥 GENDER FILTER
               if (widget.category == 'ethnic')
                 SizedBox(
                   height: 50,
@@ -186,8 +223,8 @@ class _ProductListScreenState
                       'all',
                       'men',
                       'women',
-                      'boys',
-                      'girls'
+                      'boy',
+                      'girl'
                     ].map((filter) {
                       final isSelected =
                           _selectedGenderFilter == filter;
@@ -196,7 +233,8 @@ class _ProductListScreenState
                         onTap: () {
                           setState(() {
                             _selectedGenderFilter = filter;
-                            _selectedAgeFilter = null; // reset age
+                            _selectedAgeFilter = null;
+                            _selectedExactAge = null;
                           });
                         },
                         child: Container(
@@ -210,7 +248,11 @@ class _ProductListScreenState
                           ),
                           alignment: Alignment.center,
                           child: Text(
-                            filter.toUpperCase(),
+                            filter == 'boy'
+                                ? 'BOYS'
+                                : filter == 'girl'
+                                    ? 'GIRLS'
+                                    : filter.toUpperCase(),
                             style: TextStyle(
                               color: isSelected
                                   ? Colors.white
@@ -224,46 +266,120 @@ class _ProductListScreenState
                   ),
                 ),
 
-              // 🔥 AGE FILTER (ONLY FOR BOYS/GIRLS)
-             if (_selectedGenderFilter == 'boys' ||
-    _selectedGenderFilter == 'girls')
-  Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-    child: Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: _ageOptions.map((age) {
-        final isSelected = _selectedAgeFilter == age;
+              // 🔥 AGE GROUP FILTER
+              if ((_selectedGenderFilter == 'boy' ||
+                  _selectedGenderFilter == 'girl') &&
+                     !isPreFiltered)
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: _ageOptions.map((age) {
+                      final isSelected = _selectedAgeFilter == age;
 
-        return GestureDetector(
-          onTap: () {
-            setState(() {
-              _selectedAgeFilter = age;
-            });
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? const Color(0xFF0F6C5C)
-                  : Colors.grey.shade200,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              age,
-              style: TextStyle(
-                color: isSelected ? Colors.white : Colors.black,
-                fontWeight: FontWeight.w500,
-                fontSize: 12,
-              ),
-            ),
-          ),
-        );
-      }).toList(),
-    ),
-  ),
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedAgeFilter = age;
+                            _selectedExactAge = null;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? const Color(0xFF0F6C5C)
+                                : Colors.grey.shade200,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            age,
+                            style: TextStyle(
+                              color: isSelected
+                                  ? Colors.white
+                                  : Colors.black,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
 
-              // 🔥 PRODUCT GRID / EMPTY STATE
+              // 🔥 EXACT AGE FILTER
+              if ((_selectedGenderFilter == 'boy' ||
+                      _selectedGenderFilter == 'girl') &&
+                  _selectedAgeFilter != null)
+                Builder(
+                  builder: (_) {
+                    final ageList =
+                        _getAgeOptionsFromGroup(_selectedAgeFilter);
+
+                    if (ageList.isEmpty) return const SizedBox();
+
+                    return SizedBox(
+                      height: 50,
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 12),
+                        children: [
+                          'all',
+                          ...ageList.map((e) => e.toString()),
+                        ].map((age) {
+                          final isSelected = age == 'all'
+                              ? _selectedExactAge == null
+                              : _selectedExactAge == int.parse(age);
+
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                if (age == 'all') {
+                                  _selectedExactAge = null;
+                                } else {
+                                  _selectedExactAge =
+                                      int.parse(age);
+                                }
+                              });
+                            },
+                            child: Container(
+                              margin:
+                                  const EdgeInsets.only(right: 10),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? const Color(0xFF0F6C5C)
+                                    : Colors.grey.shade200,
+                                borderRadius:
+                                    BorderRadius.circular(20),
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                age == 'all'
+                                    ? 'ALL'
+                                    : '$age Years',
+                                style: TextStyle(
+                                  color: isSelected
+                                      ? Colors.white
+                                      : Colors.black,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    );
+                  },
+                ),
+
+              // 🔥 PRODUCT GRID
               Expanded(
                 child: filteredProducts.isEmpty
                     ? const Center(

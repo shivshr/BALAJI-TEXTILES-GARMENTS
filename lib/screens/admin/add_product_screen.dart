@@ -478,21 +478,22 @@ if (_gender == 'boys' || _gender == 'girls') ...[
               ],
 
               // ── SubCategory (non-ethnic categories) ──────
-              if (_category != 'ethnic') ...[
-                DropdownButtonFormField<String>(
-                  value: _subCategory,
-                  decoration: const InputDecoration(
-                    labelText: 'Sub Category',
-                    prefixIcon: Icon(Icons.style_outlined),
-                  ),
-                  items: _currentSubCategories.map((c) => DropdownMenuItem(
-                    value: c,
-                    child: Text(c),
-                  )).toList(),
-                  onChanged: (v) => setState(() => _subCategory = v),
-                ),
-                const SizedBox(height: 12),
-              ],
+              // ── SubCategory (ONLY for non-ethnic & non-kids) ──────
+if (_category != 'ethnic' && _category != 'kids') ...[
+  DropdownButtonFormField<String>(
+    value: _subCategory,
+    decoration: const InputDecoration(
+      labelText: 'Sub Category',
+      prefixIcon: Icon(Icons.style_outlined),
+    ),
+    items: _currentSubCategories.map((c) => DropdownMenuItem(
+      value: c,
+      child: Text(c),
+    )).toList(),
+    onChanged: (v) => setState(() => _subCategory = v),
+  ),
+  const SizedBox(height: 12),
+],
 
               // ── KIDS SECTION ─────────────────────────────
               if (_category == 'kids') ...[
