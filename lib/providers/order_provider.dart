@@ -15,8 +15,8 @@ final allOrdersProvider = StreamProvider.family<List<OrderModel>, String?>((ref,
   return ref.watch(orderServiceProvider).streamAllOrders(status: status);
 });
 
-final singleOrderProvider = FutureProvider.family<OrderModel?, String>((ref, orderId) {
-  return ref.watch(orderServiceProvider).getOrder(orderId);
+final singleOrderProvider = StreamProvider.family<OrderModel?, String>((ref, orderId) {
+  return ref.watch(orderServiceProvider).streamSingleOrder(orderId);
 });
 
 // ── Date range record type ──

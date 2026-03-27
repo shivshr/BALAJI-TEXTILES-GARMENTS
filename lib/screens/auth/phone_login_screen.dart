@@ -727,7 +727,7 @@ class PhoneLoginScreen extends ConsumerStatefulWidget {
 
 class _PhoneLoginScreenState extends ConsumerState<PhoneLoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _phoneController = TextEditingController(text: '+91');
+  final _phoneController = TextEditingController();
   bool _loading = false;
 
   @override
@@ -740,7 +740,7 @@ class _PhoneLoginScreenState extends ConsumerState<PhoneLoginScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _loading = true);
 
-    final phone = _phoneController.text.trim();
+    final phone = "+91${_phoneController.text.trim()}";
     final isAdmin = kAdminPhoneNumbers.contains(phone);
 
     await ref.read(authServiceProvider).sendOtp(
@@ -926,36 +926,50 @@ class _PhoneLoginScreenState extends ConsumerState<PhoneLoginScreen> {
         Form(
           key: _formKey,
           child: TextFormField(
-            controller: _phoneController,
-            keyboardType: TextInputType.phone,
-            validator: Validators.phone,
-            style: const TextStyle(
-                fontSize: 16, fontWeight: FontWeight.w500),
-            decoration: InputDecoration(
-              labelText: 'Phone Number',
-              prefixIcon: const Icon(Icons.phone_outlined),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide:
-                    const BorderSide(color: Color(0xFF0F6C5C), width: 1.5),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide:
-                    const BorderSide(color: Color(0xFF0F6C5C), width: 2),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide:
-                    const BorderSide(color: AppColors.error, width: 1.5),
-              ),
-              focusedErrorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide:
-                    const BorderSide(color: AppColors.error, width: 2),
-              ),
-            ),
-          ),
+  controller: _phoneController,
+  keyboardType: TextInputType.number,
+  maxLength: 10,
+  validator: (value) {
+    if (value == null || value.length != 10) {
+      return "Enter valid 10-digit number";
+    }
+    return null;
+  },
+  style: const TextStyle(
+      fontSize: 16, fontWeight: FontWeight.w500),
+  decoration: InputDecoration(
+    labelText: 'Phone Number',
+
+    prefixText: "+91 ",
+    prefixStyle: const TextStyle(
+      fontWeight: FontWeight.bold,
+      color: Colors.black,
+    ),
+
+    prefixIcon: const Icon(Icons.phone_outlined),
+
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide:
+          const BorderSide(color: Color(0xFF0F6C5C), width: 1.5),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide:
+          const BorderSide(color: Color(0xFF0F6C5C), width: 2),
+    ),
+    errorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide:
+          const BorderSide(color: AppColors.error, width: 1.5),
+    ),
+    focusedErrorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide:
+          const BorderSide(color: AppColors.error, width: 2),
+    ),
+  ),
+),
         ),
         const SizedBox(height: 20),
         SizedBox(

@@ -322,9 +322,44 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 backgroundColor: AppColors.surface,
                 actions: [
                   IconButton(
-                    icon: Icon(isWishlisted ? Icons.favorite : Icons.favorite_border,
-                        color: isWishlisted ? AppColors.error : AppColors.textPrimary),
-                    onPressed: () => ref.read(wishlistProvider.notifier).toggle(product.productId),
+                    icon: Icon(
+                      isWishlisted ? Icons.favorite : Icons.favorite_border,
+                      color: isWishlisted ? AppColors.error : AppColors.textPrimary,
+                    ),
+                    onPressed: () =>
+                        ref.read(wishlistProvider.notifier).toggle(product.productId),
+                  ),
+
+                  Consumer(
+                    builder: (context, ref, _) {
+                      final count = ref.watch(cartItemCountProvider);
+
+                      return Stack(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.shopping_cart_outlined),
+                            onPressed: () => context.push(AppRoutes.cart),
+                          ),
+                          if (count > 0)
+                            Positioned(
+                              right: 6,
+                              top: 6,
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Text(
+                                  count.toString(),
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 10),
+                                ),
+                              ),
+                            ),
+                        ],
+                      );
+                    },
                   ),
                 ],
                 flexibleSpace: FlexibleSpaceBar(

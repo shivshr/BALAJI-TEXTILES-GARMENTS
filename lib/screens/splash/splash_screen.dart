@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -45,25 +46,22 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     });
   }
 
-  Future<void> _navigate() async {
+ Future<void> _navigate() async {
+  if (!mounted) return;
+
+  final user = FirebaseAuth.instance.currentUser;
+
+  if (user != null) {
+    final prefs = await SharedPreferences.getInstance();
+    final isAdmin = prefs.getBool('is_admin') ?? false;
+
     if (!mounted) return;
-
-    final authState = ref.read(authStateProvider);
-    final isLoggedIn = authState.value != null;
-
-    if (isLoggedIn) {
-      final prefs = await SharedPreferences.getInstance();
-      final isAdmin = prefs.getBool('is_admin') ?? false;
-
-      // Sync SharedPreferences into Riverpod provider
-
-      if (!mounted) return;
-      context.go(isAdmin ? AppRoutes.adminDashboard : AppRoutes.home);
-    } else {
-      if (!mounted) return;
-      context.go(AppRoutes.phoneLogin);
-    }
+    context.go(isAdmin ? AppRoutes.adminDashboard : AppRoutes.home);
+  } else {
+    if (!mounted) return;
+    context.go(AppRoutes.phoneLogin);
   }
+}
 
   @override
   void dispose() {

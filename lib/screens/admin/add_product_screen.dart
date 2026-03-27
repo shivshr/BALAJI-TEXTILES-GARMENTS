@@ -8,7 +8,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
-// ── Subcategories per category ─────────────────────────────
 const Map<String, List<String>> kSubCategories = {
   'men': [
     'Casual Shirt', 'Formal Shirt', 'T-Shirt', 'Jeans', 'Formal Pant',
@@ -24,12 +23,17 @@ const Map<String, List<String>> kSubCategories = {
   'kids': [
     'Top Wear', 'Bottom Wear', 'Ethnic', 'Casual', 'Footwear', 'Accessories',
   ],
-  'ethnic_women': [
-    'Saree', 'Chudidar', 'Ghagra Set', 'Sharara Set',
-  ],
-  'ethnic_men': [
-    'Kurta Pajama Set', 'Casual Kurta', 'Ramraj Dhoti Set',
-  ],
+  'ethnic_women': ['Saree', 'Chudidar', 'Ghagra Set', 'Sharara Set'],
+  'ethnic_men':   ['Kurta Pajama Set', 'Casual Kurta', 'Ramraj Dhoti Set'],
+};
+
+// ── Size options per category ─────────────────────────────────
+const Map<String, List<String>> kSizeOptions = {
+  'men':     ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', 'Free Size'],
+  'women':   ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', 'Free Size'],
+  'ethnic':  ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', 'Free Size'],
+  'kids':    ['0-3M', '3-6M', '6-9M', '9-12M', '1-2Y', '2-3Y', '3-4Y',
+              '4-5Y', '5-6Y', '6-7Y', '7-8Y', '8-9Y', '9-10Y', 'Free Size'],
 };
 
 class AddProductScreen extends ConsumerStatefulWidget {
@@ -59,8 +63,9 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
   String? _ageGroup;
   int?    _age;
 
-  final List<String> _imageUrls    = [];
-  final List<File>   _pickedImages = [];
+  final List<String> _imageUrls     = [];
+  final List<File>   _pickedImages  = [];
+  final List<String> _selectedSizes = []; // ✅ sizes list
 
   bool _isFeatured = false;
   bool _isActive   = true;
@@ -86,15 +91,28 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
     }
   }
 
-  // Ethnic ke liye gender-based subcategories, baaki normal
   List<String> get _currentSubCategories {
     if (_category == 'ethnic') {
-  if (_gender == 'men' || _gender == 'women') {
-    return kSubCategories['ethnic_$_gender'] ?? [];
-  }
-  return []; // boys/girls → no product types
-}
+      if (_gender == 'men' || _gender == 'women') {
+        return kSubCategories['ethnic_$_gender'] ?? [];
+      }
+      return [];
+    }
     return kSubCategories[_category] ?? [];
+  }
+
+  // ✅ Current size options based on category
+  List<String> get _currentSizeOptions =>
+      kSizeOptions[_category] ?? ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
+
+  void _toggleSize(String size) {
+    setState(() {
+      if (_selectedSizes.contains(size)) {
+        _selectedSizes.remove(size);
+      } else {
+        _selectedSizes.add(size);
+      }
+    });
   }
 
   void _addImageUrl() {
@@ -121,27 +139,24 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
     }
 
     if (_category == 'kids') {
-      if (_gender == null) { _showError('Please select gender'); return; }
+      if (_gender == null)   { _showError('Please select gender'); return; }
       if (_ageGroup == null) { _showError('Please select age group'); return; }
-      if (_ageOptions != null && _age == null) { _showError('Please select age'); return; }
+      if (_ageOptions != null && _age == null) {
+        _showError('Please select age'); return;
+      }
     }
 
     if (_category == 'ethnic') {
-  if (_gender == null) {
-    _showError('Please select Men/Women/Boys/Girls');
-    return;
-  }
-
-  if ((_gender == 'men' || _gender == 'women') && _subCategory == null) {
-    _showError('Please select product type');
-    return;
-  }
-
-  if ((_gender == 'boys' || _gender == 'girls') && _ageGroup == null) {
-    _showError('Please select age group');
-    return;
-  }
-}
+      if (_gender == null) {
+        _showError('Please select Men/Women/Boys/Girls'); return;
+      }
+      if ((_gender == 'men' || _gender == 'women') && _subCategory == null) {
+        _showError('Please select product type'); return;
+      }
+      if ((_gender == 'boys' || _gender == 'girls') && _ageGroup == null) {
+        _showError('Please select age group'); return;
+      }
+    }
 
     setState(() => _saving = true);
 
@@ -164,15 +179,26 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
             : null,
         category:    _category,
         subCategory: _subCategory ?? '',
-        gender:      (_category == 'kids' || _category == 'ethnic') ? _gender : null,
-        ageGroup: (_category == 'kids' || 
-          (_category == 'ethnic' && (_gender == 'boys' || _gender == 'girls')))
-    ? _ageGroup
-    : null,
-        age:         _category == 'kids' ? _age      : null,
+        gender: (_category == 'kids' || _category == 'ethnic')
+            ? (_gender == 'boys'
+                ? 'boy'
+                : _gender == 'girls'
+                    ? 'girl'
+                    : _gender)
+            : null,
+        ageGroup: (_category == 'kids' ||
+                (_category == 'ethnic' &&
+                    (_gender == 'boys' || _gender == 'girls')))
+            ? _ageGroup
+            : null,
+        age: (_category == 'kids' ||
+                (_category == 'ethnic' &&
+                    (_gender == 'boys' || _gender == 'girls')))
+            ? _age
+            : null,
         tags:        tags,
         imageUrls:   _imageUrls,
-        sizes:       [],
+        sizes:       _selectedSizes, // ✅ selected sizes save
         stock:       stock,
         inStock:     stock > 0,
         stockStatus: ProductModel.deriveStockStatus(stock),
@@ -365,18 +391,18 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   child: Text(c.toUpperCase()),
                 )).toList(),
                 onChanged: (v) => setState(() {
-                  _category    = v!;
-                  _subCategory = null;
-                  _gender      = null;
-                  _ageGroup    = null;
-                  _age         = null;
+                  _category      = v!;
+                  _subCategory   = null;
+                  _gender        = null;
+                  _ageGroup      = null;
+                  _age           = null;
+                  _selectedSizes.clear(); // ✅ reset sizes on category change
                 }),
               ),
               const SizedBox(height: 12),
 
               // ── ETHNIC SECTION ───────────────────────────
               if (_category == 'ethnic') ...[
-                // Header banner
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   decoration: BoxDecoration(
@@ -401,74 +427,90 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                 ),
                 const SizedBox(height: 12),
 
-                // STEP 1 — Men / Women
                 DropdownButtonFormField<String>(
                   value: _gender,
                   decoration: const InputDecoration(
                     labelText: 'Step 1 — Men or Women?',
                     prefixIcon: Icon(Icons.wc_outlined),
                   ),
-                 items: _ethnicGenders.map((g) => DropdownMenuItem(
-  value: g,
-  child: Row(
-    children: [
-      Icon(
-        g == 'men' || g == 'boys' ? Icons.male : Icons.female,
-        size: 18,
-        color: g == 'men' || g == 'boys' ? Colors.blue : Colors.pink,
-      ),
-      const SizedBox(width: 8),
-      Text(
-        g == 'men'
-            ? 'Men Ethnic'
-            : g == 'women'
-                ? 'Women Ethnic'
-                : g == 'boys'
-                    ? 'Boys Ethnic'
-                    : 'Girls Ethnic',
-        style: const TextStyle(fontWeight: FontWeight.w500),
-      ),
-    ],
-  ),
-)).toList(),
+                  items: _ethnicGenders.map((g) => DropdownMenuItem(
+                    value: g,
+                    child: Row(
+                      children: [
+                        Icon(
+                          g == 'men' || g == 'boys' ? Icons.male : Icons.female,
+                          size: 18,
+                          color: g == 'men' || g == 'boys'
+                              ? Colors.blue
+                              : Colors.pink,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          g == 'men'   ? 'Men Ethnic'   :
+                          g == 'women' ? 'Women Ethnic' :
+                          g == 'boys'  ? 'Boys Ethnic'  : 'Girls Ethnic',
+                          style: const TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                  )).toList(),
                   onChanged: (v) => setState(() {
                     _gender      = v;
                     _subCategory = null;
+                    _ageGroup    = null;
+                    _age         = null;
                   }),
                 ),
 
-              // STEP 2 — Age Group (ONLY Boys/Girls)
-if (_gender == 'boys' || _gender == 'girls') ...[
-  const SizedBox(height: 12),
-  DropdownButtonFormField<String>(
-    value: _ageGroup,
-    decoration: const InputDecoration(
-      labelText: 'Step 2 — Select Age Group',
-      prefixIcon: Icon(Icons.cake_outlined),
-    ),
-    items: _ageGroups.map((a) => DropdownMenuItem(
-      value: a,
-      child: Text(a),
-    )).toList(),
-    onChanged: (v) => setState(() {
-      _ageGroup = v;
-      _subCategory = null; // safety
-    }),
-  ),
-],
+                // Boys/Girls → Age Group
+                if (_gender == 'boys' || _gender == 'girls') ...[
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<String>(
+                    value: _ageGroup,
+                    decoration: const InputDecoration(
+                      labelText: 'Step 2 — Select Age Group',
+                      prefixIcon: Icon(Icons.cake_outlined),
+                    ),
+                    items: _ageGroups.map((a) => DropdownMenuItem(
+                      value: a, child: Text(a),
+                    )).toList(),
+                    onChanged: (v) => setState(() {
+                      _ageGroup    = v;
+                      _subCategory = null;
+                    }),
+                  ),
+                ],
 
-                // STEP 2 — SubCategory (only after gender selected)
+                // Boys/Girls → Exact Age
+                if ((_gender == 'boys' || _gender == 'girls') &&
+                    _ageGroup != null &&
+                    _ageOptions != null) ...[
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<int>(
+                    value: _age,
+                    decoration: const InputDecoration(
+                      labelText: 'Step 3 — Select Age',
+                      prefixIcon: Icon(Icons.numbers_outlined),
+                    ),
+                    items: _ageOptions!.map((a) => DropdownMenuItem(
+                      value: a, child: Text('$a Years'),
+                    )).toList(),
+                    onChanged: (v) => setState(() => _age = v),
+                  ),
+                ],
+
+                // Men/Women → SubCategory
                 if (_gender == 'men' || _gender == 'women') ...[
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
                     value: _subCategory,
                     decoration: InputDecoration(
-                      labelText: 'Step 2 — ${_gender == 'men' ? 'Men' : 'Women'} Ethnic Sub Category',
+                      labelText:
+                          'Step 2 — ${_gender == 'men' ? 'Men' : 'Women'} Ethnic Sub Category',
                       prefixIcon: const Icon(Icons.style_outlined),
                     ),
                     items: _currentSubCategories.map((c) => DropdownMenuItem(
-                      value: c,
-                      child: Text(c),
+                      value: c, child: Text(c),
                     )).toList(),
                     onChanged: (v) => setState(() => _subCategory = v),
                   ),
@@ -477,23 +519,21 @@ if (_gender == 'boys' || _gender == 'girls') ...[
                 const SizedBox(height: 12),
               ],
 
-              // ── SubCategory (non-ethnic categories) ──────
-              // ── SubCategory (ONLY for non-ethnic & non-kids) ──────
-if (_category != 'ethnic' && _category != 'kids') ...[
-  DropdownButtonFormField<String>(
-    value: _subCategory,
-    decoration: const InputDecoration(
-      labelText: 'Sub Category',
-      prefixIcon: Icon(Icons.style_outlined),
-    ),
-    items: _currentSubCategories.map((c) => DropdownMenuItem(
-      value: c,
-      child: Text(c),
-    )).toList(),
-    onChanged: (v) => setState(() => _subCategory = v),
-  ),
-  const SizedBox(height: 12),
-],
+              // ── SubCategory (men/women only) ──────────────
+              if (_category != 'ethnic' && _category != 'kids') ...[
+                DropdownButtonFormField<String>(
+                  value: _subCategory,
+                  decoration: const InputDecoration(
+                    labelText: 'Sub Category',
+                    prefixIcon: Icon(Icons.style_outlined),
+                  ),
+                  items: _currentSubCategories.map((c) => DropdownMenuItem(
+                    value: c, child: Text(c),
+                  )).toList(),
+                  onChanged: (v) => setState(() => _subCategory = v),
+                ),
+                const SizedBox(height: 12),
+              ],
 
               // ── KIDS SECTION ─────────────────────────────
               if (_category == 'kids') ...[
@@ -508,19 +548,15 @@ if (_category != 'ethnic' && _category != 'kids') ...[
                     children: [
                       Icon(Icons.child_care, color: Color(0xFF0F6C5C)),
                       SizedBox(width: 8),
-                      Text(
-                        'Kids Details',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF0F6C5C),
-                        ),
-                      ),
+                      Text('Kids Details',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF0F6C5C))),
                     ],
                   ),
                 ),
                 const SizedBox(height: 12),
 
-                // Gender
                 DropdownButtonFormField<String>(
                   value: _gender,
                   decoration: const InputDecoration(
@@ -545,7 +581,6 @@ if (_category != 'ethnic' && _category != 'kids') ...[
                 ),
                 const SizedBox(height: 12),
 
-                // Age Group
                 DropdownButtonFormField<String>(
                   value: _ageGroup,
                   decoration: const InputDecoration(
@@ -553,8 +588,7 @@ if (_category != 'ethnic' && _category != 'kids') ...[
                     prefixIcon: Icon(Icons.cake_outlined),
                   ),
                   items: _ageGroups.map((a) => DropdownMenuItem(
-                    value: a,
-                    child: Text(a),
+                    value: a, child: Text(a),
                   )).toList(),
                   onChanged: (v) => setState(() {
                     _ageGroup = v;
@@ -562,7 +596,6 @@ if (_category != 'ethnic' && _category != 'kids') ...[
                   }),
                 ),
 
-                // Specific Age (only for 1Y+ groups)
                 if (_ageGroup != null && _ageOptions != null) ...[
                   const SizedBox(height: 12),
                   DropdownButtonFormField<int>(
@@ -572,14 +605,110 @@ if (_category != 'ethnic' && _category != 'kids') ...[
                       prefixIcon: Icon(Icons.numbers_outlined),
                     ),
                     items: _ageOptions!.map((a) => DropdownMenuItem(
-                      value: a,
-                      child: Text('$a Years'),
+                      value: a, child: Text('$a Years'),
                     )).toList(),
                     onChanged: (v) => setState(() => _age = v),
                   ),
                 ],
                 const SizedBox(height: 12),
               ],
+
+              // ── SIZE SELECTION ✅ ─────────────────────────
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.straighten_outlined,
+                            size: 18, color: Color(0xFF0F6C5C)),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'Available Sizes',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const Spacer(),
+                        if (_selectedSizes.isNotEmpty)
+                          TextButton(
+                            onPressed: () =>
+                                setState(() => _selectedSizes.clear()),
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                              minimumSize: Size.zero,
+                            ),
+                            child: const Text(
+                              'Clear',
+                              style: TextStyle(
+                                  fontSize: 12, color: Colors.red),
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: _currentSizeOptions.map((size) {
+                        final isSelected = _selectedSizes.contains(size);
+                        return GestureDetector(
+                          onTap: () => _toggleSize(size),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 14, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? const Color(0xFF0F6C5C)
+                                  : Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: isSelected
+                                    ? const Color(0xFF0F6C5C)
+                                    : Colors.grey.shade300,
+                                width: isSelected ? 2 : 1,
+                              ),
+                            ),
+                            child: Text(
+                              size,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: isSelected
+                                    ? FontWeight.w700
+                                    : FontWeight.w500,
+                                color: isSelected
+                                    ? Colors.white
+                                    : Colors.grey.shade700,
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    if (_selectedSizes.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        'Selected: ${_selectedSizes.join(', ')}',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: const Color(0xFF0F6C5C),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 16),
 
               // ── Featured / Active Toggles ─────────────────
               Container(
@@ -592,34 +721,25 @@ if (_category != 'ethnic' && _category != 'kids') ...[
                   children: [
                     Expanded(
                       child: SwitchListTile(
-                        title: const Text(
-                          'Featured',
-                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                        ),
-                        subtitle: const Text(
-                          'Show on home',
-                          style: TextStyle(fontSize: 11),
-                        ),
+                        title: const Text('Featured',
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.w600)),
+                        subtitle: const Text('Show on home',
+                            style: TextStyle(fontSize: 11)),
                         value: _isFeatured,
                         activeColor: const Color(0xFF0F6C5C),
                         onChanged: (v) => setState(() => _isFeatured = v),
                       ),
                     ),
                     Container(
-                      width: 1,
-                      height: 56,
-                      color: Colors.grey.shade200,
-                    ),
+                        width: 1, height: 56, color: Colors.grey.shade200),
                     Expanded(
                       child: SwitchListTile(
-                        title: const Text(
-                          'Active',
-                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                        ),
-                        subtitle: const Text(
-                          'Visible in app',
-                          style: TextStyle(fontSize: 11),
-                        ),
+                        title: const Text('Active',
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.w600)),
+                        subtitle: const Text('Visible in app',
+                            style: TextStyle(fontSize: 11)),
                         value: _isActive,
                         activeColor: const Color(0xFF0F6C5C),
                         onChanged: (v) => setState(() => _isActive = v),
@@ -639,34 +759,28 @@ if (_category != 'ethnic' && _category != 'kids') ...[
                   onPressed: _saving ? null : _save,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF0F6C5C),
-                    disabledBackgroundColor: const Color(0xFF0F6C5C).withOpacity(0.6),
+                    disabledBackgroundColor:
+                        const Color(0xFF0F6C5C).withOpacity(0.6),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                        borderRadius: BorderRadius.circular(12)),
                     elevation: 2,
                   ),
                   child: _saving
                       ? const SizedBox(
-                          height: 22,
-                          width: 22,
+                          height: 22, width: 22,
                           child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2.5,
-                          ),
-                        )
+                              color: Colors.white, strokeWidth: 2.5))
                       : const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.check_circle_outline, color: Colors.white),
+                            Icon(Icons.check_circle_outline,
+                                color: Colors.white),
                             SizedBox(width: 8),
-                            Text(
-                              'Save Product',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
+                            Text('Save Product',
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white)),
                           ],
                         ),
                 ),
