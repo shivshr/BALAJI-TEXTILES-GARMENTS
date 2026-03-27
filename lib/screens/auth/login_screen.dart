@@ -58,7 +58,7 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
       await ref.read(authServiceProvider).verifyOtp(_otpController.text);
 
       if (mounted) {
-        if (widget.isAdmin || widget.phone == '6261668801') {
+        if (widget.isAdmin || widget.phone.contains('7204496750')) {
           // Save admin session
           final prefs = await SharedPreferences.getInstance();
           await prefs.setBool('is_admin', true);

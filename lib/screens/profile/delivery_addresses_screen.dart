@@ -1,10 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart'; // ✅ ADD THIS
 import '../../providers/address_provider.dart';
 import '../../models/address_model.dart';
 
 class DeliveryAddressesScreen extends ConsumerWidget {
   const DeliveryAddressesScreen({super.key});
+
+  // ✅ ADD THIS FUNCTION
+  Future<void> _openMap(String address) async {
+    final query = Uri.encodeComponent(address);
+
+    final url = Uri.parse(
+      "https://www.google.com/maps/search/?api=1&query=$query",
+    );
+
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      throw "Could not open map";
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -37,8 +53,18 @@ class DeliveryAddressesScreen extends ConsumerWidget {
 
                 return ListTile(
                   title: Text(address.name),
+
+                  // 🔥 CLICK → OPEN MAP
+                  onTap: () {
+                    final fullAddress =
+                        "${address.addressLine}, ${address.city}, ${address.state}, ${address.pincode}";
+                    
+                    _openMap(fullAddress);
+                  },
+
                   subtitle: Text(
                       "${address.addressLine}, ${address.city}, ${address.state} - ${address.pincode}"),
+
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [

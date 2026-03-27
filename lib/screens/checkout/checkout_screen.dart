@@ -11,6 +11,7 @@ import 'package:balaji_textile_and_garments/providers/address_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:flutter/material.dart';
+import 'package:balaji_textile_and_garments/services/pincode_service.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -30,6 +31,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   final _cityCtrl    = TextEditingController();
   final _stateCtrl   = TextEditingController();
   final _pincodeCtrl = TextEditingController();
+  final _phoneCtrl = TextEditingController();
 
   int? _selectedAddressIndex;
 
@@ -76,6 +78,31 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     }
   }
 
+  Future<void> _handlePincode(String value) async {
+      if (value.length != 6) return;
+
+      final result = await PincodeService.getLocation(value);
+
+      if (result != null) {
+        setState(() {
+          _cityCtrl.text = result['city']!;
+          _stateCtrl.text = result['state']!;
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Invalid Pincode'),
+            backgroundColor: Colors.red,
+          ),
+        );
+
+        setState(() {
+          _cityCtrl.clear();
+          _stateCtrl.clear();
+        });
+      }
+    }
+
   @override
   void dispose() {
     _nameCtrl.dispose();
@@ -83,6 +110,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     _cityCtrl.dispose();
     _stateCtrl.dispose();
     _pincodeCtrl.dispose();
+    _phoneCtrl.dispose();
     super.dispose();
   }
 
@@ -99,7 +127,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
   final address = addr.AddressModel(
     name:        _nameCtrl.text.trim(),
-    phone:       '',
+    phone:       _phoneCtrl.text.trim(),
     addressLine: _streetCtrl.text.trim(),
     city:        _cityCtrl.text.trim(),
     state:       _stateCtrl.text.trim(),
@@ -306,6 +334,18 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     ),
                     const SizedBox(height: 14),
                     _StyledField(
+                    controller: _phoneCtrl,
+                    label: 'Phone Number',
+                    icon: Icons.phone_outlined,
+                    keyboardType: TextInputType.phone,
+                    validator: (v) {
+                      if (v == null || v.isEmpty) return 'Phone required';
+                      if (v.length != 10) return 'Enter valid number';
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 14),
+                    _StyledField(
                       controller: _streetCtrl,
                       label: 'Street Address',
                       icon: Icons.home_outlined,
@@ -335,16 +375,19 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                       ],
                     ),
                     const SizedBox(height: 14),
-                    _StyledField(
+                    TextFormField(
                       controller: _pincodeCtrl,
-                      label: 'Pincode',
-                      icon: Icons.pin_outlined,
-                      validator: Validators.pincode,
                       keyboardType: TextInputType.number,
                       maxLength: 6,
+                      onChanged: _handlePincode,
+                      validator: Validators.pincode,
                       inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly
+                        FilteringTextInputFormatter.digitsOnly,
                       ],
+                      decoration: const InputDecoration(
+                        labelText: 'Pincode',
+                        prefixIcon: Icon(Icons.pin_outlined),
+                      ),
                     ),
                   ],
                 ),
